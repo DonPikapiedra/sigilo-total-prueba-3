@@ -3,16 +3,25 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Juego de Sigilo</title>
+    <title>Sigilo Total</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <canvas id="gameCanvas"></canvas>
-    <div id="hud">
-        <p>Tiempo: <span id="time">0</span>s</p>
-        <p>Ruido: <span id="noise">0</span></p>
-        <p>Objetivo: Roba el objeto y escapa</p>
+    <div id="menu">
+        <h1>Sigilo Total</h1>
+        <button onclick="startGame()">Jugar</button>
+        <button onclick="showControls()">Controles</button>
     </div>
-    <script src="game.js"></script>
+    
+    <div id="controls" style="display:none;">
+        <h2>Controles</h2>
+        <p>WASD o Flechas - Moverse</p>
+        <p>Evita el cono de luz de los enemigos</p>
+        <button onclick="hideControls()">Volver</button>
+    </div>
+
+    <canvas id="gameCanvas" style="display:none;"></canvas>
+
+    <script src="script.js"></script>
 </body>
 </html>
