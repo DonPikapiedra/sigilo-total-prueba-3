@@ -1,19 +1,37 @@
 body {
-    margin: 0;
-    overflow: hidden;
-    background: black;
-    font-family: Arial, sans-serif;
+    text-align: center;
+    background: #111;
     color: white;
+    font-family: Arial, sans-serif;
 }
-canvas {
-    display: block;
-    background: #222;
-}
-#hud {
+
+#menu, #controls {
     position: absolute;
-    top: 10px;
-    left: 10px;
-    background: rgba(0, 0, 0, 0.7);
-    padding: 10px;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(0, 0, 0, 0.8);
+    padding: 20px;
+    border-radius: 10px;
+}
+
+button {
+    display: block;
+    margin: 10px auto;
+    padding: 10px 20px;
+    background: #ff3333;
+    color: white;
+    border: none;
     border-radius: 5px;
+    cursor: pointer;
+}
+
+button:hover {
+    background: #cc0000;
+}
+
+canvas {
+    background: black;
+    display: block;
+    margin: auto;
 }
