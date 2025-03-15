@@ -5,6 +5,7 @@ window.onload = function() {
     canvas.height = 600;
 
     let gameRunning = false;
+    let detectionTimer = 0;
 
     // Jugador
     const player = {
@@ -14,7 +15,7 @@ window.onload = function() {
 
     // Enemigos
     const enemies = [
-        { x: 400, y: 200, speed: 2, dir: "right", coneAngle: Math.PI / 4 }
+        { x: 400, y: 200, speed: 1.5, state: "patrolling", visionRange: 150 }
     ];
 
     // Movimiento del jugador
@@ -41,7 +42,7 @@ window.onload = function() {
         ctx.fillStyle = "rgba(255, 255, 0, 0.3)";
         ctx.beginPath();
         ctx.moveTo(enemy.x + 10, enemy.y + 10);
-        ctx.arc(enemy.x + 10, enemy.y + 10, 100, -Math.PI / 6, Math.PI / 6);
+        ctx.arc(enemy.x + 10, enemy.y + 10, enemy.visionRange, -Math.PI / 6, Math.PI / 6);
         ctx.closePath();
         ctx.fill();
     }
@@ -61,27 +62,58 @@ window.onload = function() {
         player.y += player.dy;
     }
 
-    // Mueve los enemigos
+    // IA de enemigos
     function moveEnemies() {
-        enemies.forEach(enemy => {
-            if (enemy.dir === "right") enemy.x += enemy.speed;
-            if (enemy.dir === "left") enemy.x -= enemy.speed;
-            if (enemy.x > canvas.width - 20) enemy.dir = "left";
-            if (enemy.x < 0) enemy.dir = "right";
-        });
-    }
-
-    // Detecta colisión con la luz del enemigo
-    function checkDetection() {
         enemies.forEach(enemy => {
             const distX = player.x - enemy.x;
             const distY = player.y - enemy.y;
             const distance = Math.sqrt(distX * distX + distY * distY);
-            if (distance < 50) {
+
+            if (distance < enemy.visionRange) {
+                enemy.state = "chasing";
+            } else {
+                enemy.state = "patrolling";
+            }
+
+            if (enemy.state === "chasing") {
+                // Perseguir al jugador
+                const angle = Math.atan2(distY, distX);
+                enemy.x += Math.cos(angle) * enemy.speed;
+                enemy.y += Math.sin(angle) * enemy.speed;
+            } else {
+                // Patrullar horizontalmente
+                if (!enemy.dir) enemy.dir = "right";
+                if (enemy.dir === "right") enemy.x += enemy.speed;
+                if (enemy.dir === "left") enemy.x -= enemy.speed;
+                if (enemy.x > canvas.width - 20) enemy.dir = "left";
+                if (enemy.x < 0) enemy.dir = "right";
+            }
+        });
+    }
+
+    // Detecta si el jugador es visto por un enemigo por más de 2 segundos
+    function checkDetection() {
+        let detected = false;
+
+        enemies.forEach(enemy => {
+            const distX = player.x - enemy.x;
+            const distY = player.y - enemy.y;
+            const distance = Math.sqrt(distX * distX + distY * distY);
+
+            if (distance < enemy.visionRange) {
+                detected = true;
+            }
+        });
+
+        if (detected) {
+            detectionTimer += 16; // Aproximadamente 16ms por frame
+            if (detectionTimer >= 2000) { // 2 segundos
                 alert("¡Has sido detectado!");
                 resetGame();
             }
-        });
+        } else {
+            detectionTimer = 0;
+        }
     }
 
     // Bucle del juego
@@ -120,6 +152,7 @@ window.onload = function() {
     function resetGame() {
         player.x = 100;
         player.y = 100;
+        detectionTimer = 0;
         gameRunning = false;
         document.getElementById("menu").style.display = "block";
         document.getElementById("gameCanvas").style.display = "none";
